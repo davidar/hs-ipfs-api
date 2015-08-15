@@ -1,0 +1,24 @@
+package Network.IPFS.MerkleDAG;
+
+// An IPFS MerkleDAG Link
+message PBLink {
+
+  // multihash of the target object
+  optional bytes hash = 1;
+
+  // utf string name. should be unique per object
+  optional string name = 2;
+
+  // cumulative size of target object
+  optional uint64 size = 3;
+}
+
+// An IPFS MerkleDAG Node
+message PBNode {
+
+  // refs to other objects
+  repeated PBLink links = 2;
+
+  // opaque user data
+  optional bytes data = 1;
+}
