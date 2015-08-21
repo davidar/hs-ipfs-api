@@ -54,7 +54,8 @@ library
   exposed-modules:     Network.IPFS
   
   -- Modules included in this library but not exported.
-  other-modules:       Network.IPFS.MerkleDAG,
+  other-modules:       Network.IPFS.API,
+                       Network.IPFS.MerkleDAG,
                        Network.IPFS.MerkleDAG.PBLink,
                        Network.IPFS.MerkleDAG.PBNode
   
@@ -69,7 +70,9 @@ library
                        bytestring,
                        base58-bytestring,
                        protocol-buffers,
-                       protocol-buffers-descriptor
+                       protocol-buffers-descriptor,
+                       text,
+                       utf8-string
   
   -- Directories containing source files.
   hs-source-dirs:      src

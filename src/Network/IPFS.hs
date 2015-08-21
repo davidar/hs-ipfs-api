@@ -1,21 +1,16 @@
-{-# LANGUAGE
-    DataKinds,
-    DeriveGeneric,
-    OverloadedStrings #-}
-
 module Network.IPFS where
 
-import Control.Applicative
+import Control.Applicative ((<$>))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Base58 as B58
-import Data.Maybe
+import qualified Data.ByteString.Char8 as C
+import Data.Maybe (fromJust)
 import Data.Foldable (toList)
-import Network.HTTP.Conduit
-import Network.HTTP.Types.URI
-import Blaze.ByteString.Builder (toByteString)
+import qualified Network.HTTP.Conduit as HTTP
 import Text.ProtocolBuffers.WireMessage (messageGet)
 import Text.ProtocolBuffers.Basic (uToString)
+import qualified Network.IPFS.API as API
 import qualified Network.IPFS.MerkleDAG.PBNode as PBN
 import qualified Network.IPFS.MerkleDAG.PBLink as PBL
 
@@ -27,20 +22,16 @@ data Object = Object { hash :: Hash
                      , links :: [(String, Object)]
                      } deriving (Show)
 
-getPBNode :: Manager -> String -> Hash -> IO PBN.PBNode
+getPBNode :: HTTP.Manager -> String -> Hash -> IO PBN.PBNode
 getPBNode manager endpoint digest = do
-    result <- messageGet . responseBody <$> httpLbs req manager
-    return $ case result of
+    resp <- API.call manager endpoint
+        ["object", "get"] [("encoding", "protobuf")]
+        [C.unpack $ B58.encodeBase58 B58.bitcoinAlphabet digest]
+    return $ case messageGet resp of
         Right (node, _) -> node
         Left err -> error err
-  where b58 = B58.encodeBase58 B58.bitcoinAlphabet digest
-        cmd = ["object", "get"]
-        query = [("encoding", Just "protobuf"), ("arg", Just b58)]
-        req = (fromJust $ parseUrl endpoint) {
-            path = toByteString . encodePathSegments $ ["api", "v0"] ++ cmd,
-            queryString = renderQuery True query }
 
-getObject :: Manager -> String -> Hash -> IO Object
+getObject :: HTTP.Manager -> String -> Hash -> IO Object
 getObject manager endpoint = resolve
   where resolve digest = do
             pbnode <- getPBNode manager endpoint digest
