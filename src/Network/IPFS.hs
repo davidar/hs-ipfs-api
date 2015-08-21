@@ -21,6 +21,9 @@ data Object = Object { hash :: Hash
                      , links :: [(String, Object)]
                      } deriving (Show)
 
+cat :: API.Endpoint -> String -> IO BL.ByteString
+cat endpoint path = API.call endpoint ["cat"] [] [path]
+
 getPBNode :: API.Endpoint -> Hash -> IO PBN.PBNode
 getPBNode endpoint digest = do
     resp <- API.call endpoint
