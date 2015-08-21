@@ -57,7 +57,11 @@ library
   -- Modules included in this library but not exported.
   other-modules:       Network.IPFS.MerkleDAG,
                        Network.IPFS.MerkleDAG.PBLink,
-                       Network.IPFS.MerkleDAG.PBNode
+                       Network.IPFS.MerkleDAG.PBNode,
+                       Network.IPFS.UnixFS,
+                       Network.IPFS.UnixFS.Data,
+                       Network.IPFS.UnixFS.Data.DataType,
+                       Network.IPFS.UnixFS.Metadata
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    

@@ -1,5 +1,5 @@
-all: protobuf
+all: merkledag.pb unixfs.pb
 	cabal build
 
-protobuf: merkledag.proto
-	hprotoc -I src -d src merkledag.proto
+%.pb: pb/%.proto
+	hprotoc -I src -d src $<
