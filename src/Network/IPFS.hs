@@ -31,12 +31,11 @@ getPBNode endpoint digest = do
         Left err -> error err
 
 getObject :: API.Endpoint -> Hash -> IO Object
-getObject endpoint = resolve
-  where resolve digest = do
-            pbnode <- getPBNode endpoint digest
-            let links' = toList $ PBN.links pbnode
-                names = uToString . fromJust . PBL.name <$> links'
-                data' = BL.toStrict . fromJust $ PBN.data' pbnode
-            children <- mapM resolveLink links'
-            return (Object digest data' $ zip names children)
-        resolveLink = resolve . BL.toStrict . fromJust . PBL.hash
+getObject endpoint digest = do
+    pbnode <- getPBNode endpoint digest
+    let links' = toList $ PBN.links pbnode
+        names = uToString . fromJust . PBL.name <$> links'
+        data' = BL.toStrict . fromJust $ PBN.data' pbnode
+    children <- mapM resolveLink links'
+    return (Object digest data' $ zip names children)
+  where resolveLink = getObject endpoint . BL.toStrict . fromJust . PBL.hash
