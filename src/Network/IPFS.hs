@@ -7,7 +7,6 @@ import qualified Data.ByteString.Base58 as B58
 import qualified Data.ByteString.Char8 as C
 import Data.Maybe (fromJust)
 import Data.Foldable (toList)
-import qualified Network.HTTP.Conduit as HTTP
 import Text.ProtocolBuffers.WireMessage (messageGet)
 import Text.ProtocolBuffers.Basic (uToString)
 import qualified Network.IPFS.API as API
@@ -22,19 +21,19 @@ data Object = Object { hash :: Hash
                      , links :: [(String, Object)]
                      } deriving (Show)
 
-getPBNode :: HTTP.Manager -> String -> Hash -> IO PBN.PBNode
-getPBNode manager endpoint digest = do
-    resp <- API.call manager endpoint
+getPBNode :: API.Endpoint -> Hash -> IO PBN.PBNode
+getPBNode endpoint digest = do
+    resp <- API.call endpoint
         ["object", "get"] [("encoding", "protobuf")]
         [C.unpack $ B58.encodeBase58 B58.bitcoinAlphabet digest]
     return $ case messageGet resp of
         Right (node, _) -> node
         Left err -> error err
 
-getObject :: HTTP.Manager -> String -> Hash -> IO Object
-getObject manager endpoint = resolve
+getObject :: API.Endpoint -> Hash -> IO Object
+getObject endpoint = resolve
   where resolve digest = do
-            pbnode <- getPBNode manager endpoint digest
+            pbnode <- getPBNode endpoint digest
             let links' = toList $ PBN.links pbnode
                 names = uToString . fromJust . PBL.name <$> links'
                 data' = BL.toStrict . fromJust $ PBN.data' pbnode
