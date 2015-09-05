@@ -16,6 +16,7 @@ init host = do
     manager <- HTTP.newManager HTTP.tlsManagerSettings
     return $ Endpoint manager host
 
+-- TODO: newtype the Stringly stuff.
 call :: Endpoint
      -> [String]
      -> [(String, String)]

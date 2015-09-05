@@ -16,11 +16,13 @@ import qualified Network.IPFS.MerkleDAG.PBLink as PBL
 type Hash = B.ByteString -- TODO use multihash library
 type Data = B.ByteString
 
+-- newtype the links, hash, and data.
 data Object = Object { hash :: Hash
                      , payload :: Data
                      , links :: [(String, Object)]
                      } deriving (Show)
 
+-- newtype the String
 cat :: API.Endpoint -> String -> IO BL.ByteString
 cat endpoint path = API.call endpoint ["cat"] [] [path]
 
